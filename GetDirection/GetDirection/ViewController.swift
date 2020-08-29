@@ -29,7 +29,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
         locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingHeading()
+       locationManager.startUpdatingLocation()
         
         mapView.delegate = self
         
@@ -38,6 +38,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
     }
 
     @IBAction func getDirectionTapped(_ sender: Any) {
+        let sourceCordinate = (locationManager.location?.coordinate)!
+        print(sourceCordinate)
         getAddress()
     }
     func getAddress(){
@@ -47,18 +49,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
             guard let placemarks = placemarks, let location = placemarks.first?.location else{
                 return
             }
-            
-            
-            
             print(location)
             self.mapThis(destinationCord: location.coordinate)
         }
     }
+   
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print(locations)
+//       guard let locValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+//        print("locations = \(locValue.latitude) \(locValue.longitude)")
     }
     func mapThis(destinationCord: CLLocationCoordinate2D){
         let sourceCordinate = (locationManager.location?.coordinate)!
+        print(sourceCordinate)
         let sourcePlaceMark = MKPlacemark(coordinate: sourceCordinate)
         let destPlaceMark = MKPlacemark(coordinate: destinationCord)
         
@@ -75,10 +77,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
         directions.calculate { (response, error) in
             guard let response = response else{
                 if let error = error{
+                   print("no response")
                     print(error)
                 }
                 return
             }
+            print(response)
             let routes = response.routes[0]
             self.mapView.addOverlay(routes.polyline)
             self.mapView.setVisibleMapRect(routes.polyline.boundingMapRect, animated: true)
